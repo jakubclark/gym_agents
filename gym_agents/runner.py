@@ -42,7 +42,7 @@ def main(ctx, display, load, agent_id, environment_id, num_episodes, num_steps, 
     done = False
 
     episode_rewards = []
-    saved_ten_episode_mean = -500
+    saved_mean = -500
 
     for epi in range(num_episodes):
         log.info(f'Running episode number {epi}')
@@ -68,14 +68,14 @@ def main(ctx, display, load, agent_id, environment_id, num_episodes, num_steps, 
 
             if epi >= train_starts:
                 if done:
-                    ten_episode_mean = np.mean(episode_rewards[-11:-1])
+                    n_episodes_mean = np.mean(episode_rewards[-save_freq+1:-1])
 
-                    if epi % save_freq == 0 and ten_episode_mean > saved_ten_episode_mean:
-                        s = f'Saving model due to increase in mean reward: {saved_ten_episode_mean}->{ten_episode_mean}'
+                    if epi % save_freq == 0 and n_episodes_mean > saved_mean:
+                        s = f'Saving model due to increase in mean reward: {saved_mean}->{n_episodes_mean}'
                         click.echo(s)
                         log.info(s)
                         agent.save(f'models/{environment_id}-{agent_id}.model')
-                        saved_ten_episode_mean = ten_episode_mean
+                        saved_mean = n_episodes_mean
 
                     log.info(
                         f'Episode: {epi}/{num_episodes}, Score: {episode_rewards[-1]}')
