@@ -18,10 +18,13 @@ log = getLogger(__name__)
 @click.option('--load', '-l', default=None, help='Load the agent\'s model')
 @click.option('--agent_id', '-a', default='RandomAgent', type=str, help='The agent id to use.')
 @click.option('--environment_id', '-e', default='Breakout-v0', type=str, help='The environment id to use.')
-@click.option('--num_episodes', '-n', default=100, type=int, help='Number of episodes to run.')
+@click.option('--num_episodes', '-n', default=500, type=int, help='Number of episodes to run.')
 @click.option('--num_steps', '-s', default=500, type=int, help='Number of steps to run per episode')
+@click.option('--train_starts', default=50, type=int, help='Number of episodes to run before training actually begins.')
+@click.option('--save_freq', default=10, type=int,
+              help='Number of episodes to run in between potential model saving')
 @click.pass_context
-def main(ctx, display, load, agent_id, environment_id, num_episodes, num_steps):
+def main(ctx, display, load, agent_id, environment_id, num_episodes, num_steps, train_starts, save_freq):
     if ctx.invoked_subcommand is not None:
         return
 
@@ -38,13 +41,15 @@ def main(ctx, display, load, agent_id, environment_id, num_episodes, num_steps):
     reward = 0
     done = False
 
+    episode_rewards = []
+    saved_ten_episode_mean = -500
+
     for epi in range(num_episodes):
         log.info(f'Running episode number {epi}')
         state = env.reset()
         state = np.reshape(state, [1, state_size])
 
-        total_reward = 0
-
+        episode_rewards.append(0.0)
         for step in range(num_steps):
             if display:
                 env.render()
@@ -58,17 +63,27 @@ def main(ctx, display, load, agent_id, environment_id, num_episodes, num_steps):
             agent.remember(state, action, reward, next_state, done)
 
             reward = -10 if done else reward
-            total_reward += reward
-
+            episode_rewards[-1] += reward
             state = next_state
 
-            if done:
-                agent.episode_done(epi)
-                log.info(
-                    f'Episode: {epi}/{num_episodes}, score: {total_reward}')
-                break
+            if epi >= train_starts:
+                if done:
+                    ten_episode_mean = np.mean(episode_rewards[-11:-1])
 
-            agent.step_done(step)
+                    if epi % save_freq == 0 and ten_episode_mean > saved_ten_episode_mean:
+                        s = f'Saving model due to increase in mean reward: {saved_ten_episode_mean}->{ten_episode_mean}'
+                        click.echo(s)
+                        log.info(s)
+                        agent.save(f'models/{environment_id}-{agent_id}.model')
+                        saved_ten_episode_mean = ten_episode_mean
+
+                    log.info(
+                        f'Episode: {epi}/{num_episodes}, Score: {episode_rewards[-1]}')
+                    agent.episode_done(epi)
+                agent.step_done(step)
+
+            if done:
+                break
     env.close()
 
 

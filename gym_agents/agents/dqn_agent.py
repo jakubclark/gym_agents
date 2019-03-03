@@ -3,7 +3,6 @@ from collections import deque
 from logging import getLogger
 
 import numpy as np
-from click import echo
 from keras import Sequential
 from keras.layers.core import Dense
 from keras.optimizers import Adam
@@ -68,11 +67,11 @@ class DQNAgent(BaseAgent):
             self.epsilon *= self.epsilon_decay
 
     def load(self, name):
-        echo(f'Loading {name} dqn model')
+        log.info(f'Loading {name} dqn model')
         self.model.load_weights(name)
 
     def save(self, name):
-        echo(f'Saving dqn model to {name}')
+        log.info(f'Saving dqn model to {name}')
         self.model.save_weights(name)
 
     def step_done(self, step_num):
@@ -80,6 +79,4 @@ class DQNAgent(BaseAgent):
             self.replay()
 
     def episode_done(self, episode_num):
-        if episode_num % 10 == 0:
-            self.save(f'save/dqn_agent{episode_num}')
         self.target_model.set_weights(self.model.get_weights())
