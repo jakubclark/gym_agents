@@ -1,6 +1,6 @@
+import json
 import random
 from collections import deque
-import json
 from logging import getLogger
 
 import numpy as np
