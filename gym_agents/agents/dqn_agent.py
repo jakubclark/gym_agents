@@ -1,5 +1,6 @@
 import random
 from collections import deque
+import json
 from logging import getLogger
 
 import numpy as np
@@ -53,6 +54,10 @@ class DQNAgent(BaseAgent):
         act_values = self.model.predict(state)
         return np.argmax(act_values[0])
 
+    def act_model(self, state, reward, done):
+        act_values = self.model.predict(state)
+        return np.argmax(act_values[0])
+
     def replay(self):
         sub_batch = random.sample(self.memory, self.batch_size)
         for state, action, reward, next_state, done in sub_batch:
@@ -69,10 +74,23 @@ class DQNAgent(BaseAgent):
     def load(self, name):
         log.info(f'Loading {name} dqn model')
         self.model.load_weights(name)
+        self.update_target_model()
+
+    @property
+    def status(self) -> dict:
+        return {
+            'gamma': self.gamma,
+            'epsilon': self.epsilon,
+            'epsilon_min': self.epsilon_min,
+            'epsilon_decay': self.epsilon_decay,
+            'learning_rate': self.learning_rate,
+        }
 
     def save(self, name):
         log.info(f'Saving dqn model to {name}')
         self.model.save_weights(name)
+        with open(f'{name}.json', 'w') as fh:
+            json.dump(self.status, fh, indent=2)
 
     def step_done(self, step_num):
         if len(self.memory) > self.batch_size:
