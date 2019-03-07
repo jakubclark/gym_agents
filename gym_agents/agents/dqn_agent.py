@@ -89,8 +89,6 @@ class DQNAgent(BaseAgent):
     def save(self, name):
         log.info(f'Saving dqn model to {name}')
         self.model.save_weights(name)
-        with open(f'{name}.json', 'w') as fh:
-            json.dump(self.status, fh, indent=2)
 
     def step_done(self, step_num):
         if len(self.memory) > self.batch_size:
