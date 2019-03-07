@@ -100,6 +100,7 @@ class Runner:
         self.test_episode_rewards = [0.0]
 
         self.saved_mean = -500
+        self.saved_means = []
         self.model_file_path = f'models/{self.environment_id}-{self.agent_id}.model'
 
         if load_model_path:
@@ -151,6 +152,7 @@ class Runner:
                     log.info(s)
                     self.agent.save(self.model_file_path)
                     self.saved_mean = n_episodes_mean
+                    self.saved_means.append(self.saved_mean)
 
                 last_episode_reward = self.train_episode_rewards[-1]
                 log.info(
@@ -216,6 +218,7 @@ class Runner:
                 'train_episode_rewards': self.train_episode_rewards,
                 'test_episode_rewards': self.test_episode_rewards,
                 'saved_mean': self.saved_mean,
+                'saved_means': self.saved_means,
                 'saved_model': self.model_file_path
             },
             'agent_config': self.agent.status,
