@@ -17,6 +17,7 @@ log = getLogger(__name__)
 
 
 @click.group(invoke_without_command=True)
+@click.option('--display', '-d', is_flag=True, help='Display the agent when testing')
 @click.option('--model_path', '-m', default=None, help='Path to agent\'s model')
 @click.option('--agent_id', '-a', default='RandomAgent', type=str, help='The agent id to use.')
 @click.option('--environment_id', '-e', default='Breakout-v0', type=str, help='The environment id to use.')
@@ -27,7 +28,7 @@ log = getLogger(__name__)
 @click.option('--train_freq', default=30, type=int, help='Number of episodes in between model training')
 @click.option('--play', is_flag=True, help='Have the agent play the game, without training')
 @click.pass_context
-def main(ctx, model_path, agent_id, environment_id, num_steps,
+def main(ctx, display, model_path, agent_id, environment_id, num_steps,
          train_starts, save_freq, update_freq, train_freq, play):
     if ctx.invoked_subcommand is not None:
         return
@@ -36,12 +37,12 @@ def main(ctx, model_path, agent_id, environment_id, num_steps,
                     train_starts, save_freq, update_freq, train_freq)
 
     if play:
-        runner.play_testing_games()
+        runner.play_testing_games(display=display)
         runner.save_config()
         return
 
     runner.play_training_games()
-    runner.play_testing_games()
+    runner.play_testing_games(display=display)
     runner.save_config()
 
 
@@ -168,7 +169,7 @@ class Runner:
                 self.train_episode_rewards.append(0.0)
                 continue
 
-    def play_testing_games(self):
+    def play_testing_games(self, display=False):
         click.echo(f'Restoring best performing model')
         self.agent.load(self.model_file_path)
 
@@ -181,6 +182,8 @@ class Runner:
                 state = np.reshape(state, [1, self.state_size])
 
                 self.test_episode_rewards[-1] += reward
+                if display:
+                    self.env.render()
 
             epi = len(self.test_episode_rewards)
             score = self.test_episode_rewards[-1]
