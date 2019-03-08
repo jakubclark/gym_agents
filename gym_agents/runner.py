@@ -118,12 +118,15 @@ class Runner:
                 next_state = np.reshape(next_state, [1, self.state_size])
                 self.agent.remember(state, action, reward, next_state, done)
 
+        with click.progressbar(range(self.num_steps)) as bar:
+            self._play_training_games(bar)
+
+    def _play_training_games(self, bar):
         state = self.env.reset()
         state = np.reshape(state, [1, self.state_size])
         reward = 0
         done = False
-
-        for step in range(self.num_steps):
+        for step in bar:
 
             # Action part
             action = self.agent.act(state, reward, done)
@@ -141,14 +144,14 @@ class Runner:
 
             if done:
                 n_episodes_mean = np.mean(
-                    self.train_episode_rewards[-self.save_freq+1:-1])
+                    self.train_episode_rewards[-self.save_freq+1:])
 
                 epi = len(self.train_episode_rewards)
 
                 if epi % self.save_freq == 0 and n_episodes_mean > self.saved_mean:
                     s = (f'Saving model due to increase in mean reward, over the last '
                          f'{self.save_freq} episodes: {self.saved_mean}->{n_episodes_mean}')
-                    click.echo(s)
+                    click.echo(f'\n{s}')
                     log.info(s)
                     self.agent.save(self.model_file_path)
                     self.saved_mean = n_episodes_mean
