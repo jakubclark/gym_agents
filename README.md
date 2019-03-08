@@ -47,11 +47,20 @@ $ python -m gym_agents --help
 ```
 Usage: runner.py [OPTIONS] COMMAND [ARGS]...
 Options:
-  -d, --display               Display the game as its running.
-  -a, --agent_id TEXT         The agent id to use.
-  -e, --environment_id TEXT   The environment id to use.
-  -e, --num_episodes INTEGER  Number of episodes to run.
-  --help                      Show this message and exit.
+  -d, --display              Display the agent when testing
+  -m, --model_path TEXT      Path to agent's model
+  -a, --agent_id TEXT        The agent id to use.
+  -e, --environment_id TEXT  The environment id to use.
+  -s, --num_steps INTEGER    Number of steps to run per episode
+  --train_starts INTEGER     Number of episodes to run before training
+                             actually begins.
+  --save_freq INTEGER        Number of episodes to run in between potential
+                             model saving
+  --update_freq INTEGER      Number of episodes to run in between target model
+                             updates
+  --train_freq INTEGER       Number of episodes in between model training
+  --play                     Have the agent play the game, without training
+  --help                     Show this message and exit.
 
 Commands:
   list_agents
