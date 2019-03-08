@@ -1,4 +1,3 @@
-import json
 import random
 from collections import deque
 from logging import getLogger
@@ -20,7 +19,7 @@ class DQNAgent(BaseAgent):
         self.action_size = action_space.n
         self.memory = deque(maxlen=2000)
         self.gamma = kwargs.pop('gamma', 0.95)
-        self.epsilon = kwargs.pop('epsilon', 1)
+        self.epsilon = kwargs.pop('epsilon', 1.)
         self.epsilon_min = kwargs.pop('epsilon_min', 0.01)
         self.epsilon_decay = kwargs.pop('epsilon_decay', 0.99)
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)

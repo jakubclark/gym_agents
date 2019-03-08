@@ -25,13 +25,13 @@ class BaseAgent(ABC):
         """
         self.memory.append((state, action, reward, next_state, done))
 
-    def save(self):
+    def save(self, path):
         """
         Save the model of the agent
         """
         pass
 
-    def load(self):
+    def load(self, path):
         """
         Load the model of the agent
         """

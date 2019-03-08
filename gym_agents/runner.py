@@ -19,13 +19,13 @@ log = getLogger(__name__)
 @click.group(invoke_without_command=True)
 @click.option('--display', '-d', is_flag=True, help='Display the agent when testing')
 @click.option('--model_path', '-m', default=None, help='Path to agent\'s model')
-@click.option('--agent_id', '-a', default='RandomAgent', type=str, help='The agent id to use.')
-@click.option('--environment_id', '-e', default='Breakout-v0', type=str, help='The environment id to use.')
+@click.option('--agent_id', '-a', default='DQNAgent', type=str, help='The agent id to use.')
+@click.option('--environment_id', '-e', default='CustomMountainCar-v0', type=str, help='The environment id to use.')
 @click.option('--num_steps', '-s', default=10000, type=int, help='Number of steps to run per episode')
 @click.option('--train_starts', default=50, type=int, help='Number of episodes to run before training actually begins.')
 @click.option('--save_freq', default=10, type=int, help='Number of episodes to run in between potential model saving')
-@click.option('--update_freq', default=20, type=int, help='Number of episodes to run in between target model updates')
-@click.option('--train_freq', default=30, type=int, help='Number of episodes in between model training')
+@click.option('--update_freq', default=5, type=int, help='Number of episodes to run in between target model updates')
+@click.option('--train_freq', default=5, type=int, help='Number of episodes in between model training')
 @click.option('--play', is_flag=True, help='Have the agent play the game, without training')
 @click.pass_context
 def main(ctx, display, model_path, agent_id, environment_id, num_steps,
@@ -136,7 +136,7 @@ class Runner:
             self.train_episode_rewards[-1] += reward
             state = next_state
 
-            if epi % self.train_freq == 0:
+            if step % self.train_freq == 0:
                 self.agent.step_done(step)
 
             if done:
@@ -189,7 +189,7 @@ class Runner:
 
             epi = len(self.test_episode_rewards)
             score = self.test_episode_rewards[-1]
-            s = f'Test Episode: {epi}/100, Score: {score} '
+            s = f'Test Episode: {epi}/100, Score: {score}'
             click.echo(s)
             log.info(s)
 
