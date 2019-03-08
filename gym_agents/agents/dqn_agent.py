@@ -14,7 +14,7 @@ log = getLogger(__name__)
 
 
 class DQNAgent(BaseAgent):
-    def __init__(self, action_space, observation_space, *args, **kwargs):
+    def __init__(self, action_space, observation_space, model=None, *args, **kwargs):
         self.state_size = flatten_shape(observation_space)
         self.action_size = action_space.n
         self.memory = deque(maxlen=2000)
@@ -25,12 +25,11 @@ class DQNAgent(BaseAgent):
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)
         self.batch_size = kwargs.pop('batch_size', 32)
 
-        self.model = self._build_model()
+        self.model = model or self._build_model()
         self.target_model = self._build_model()
         self.update_target_model()
 
-        if kwargs.get('model', None) is not None:
-            self.load(kwargs.pop('model', None))
+        self.histories = []
 
     def _build_model(self):
         model = Sequential()
@@ -66,7 +65,8 @@ class DQNAgent(BaseAgent):
             else:
                 t = self.target_model.predict(next_state)[0]
                 target[0][action] = reward + self.gamma * np.amax(t)
-            self.model.fit(state, target, epochs=1, verbose=0)
+            history = self.model.fit(state, target, epochs=1, verbose=0)
+            self.histories.append(history)
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
