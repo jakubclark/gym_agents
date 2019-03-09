@@ -98,6 +98,7 @@ class Runner:
 
         self.train_episode_rewards = [0.0]
         self.test_episode_rewards = [0.0]
+        self.train_epsilons = []
 
         self.saved_mean = -500
         self.saved_means = []
@@ -155,7 +156,10 @@ class Runner:
                     log.info(s)
                     self.agent.save(self.model_file_path)
                     self.saved_mean = n_episodes_mean
-                    self.saved_means.append(self.saved_mean)
+                    self.saved_means.append({
+                        'episode_num': epi,
+                        f'{self.save_freq}_episode_mean': self.saved_mean
+                    })
 
                 last_episode_reward = self.train_episode_rewards[-1]
                 log.info(
@@ -172,6 +176,7 @@ class Runner:
                 state = self.env.reset()
                 state = np.reshape(state, [1, self.state_size])
                 self.train_episode_rewards.append(0.0)
+                self.train_epsilons.append(self.agent.epsilon)
                 continue
 
     def play_testing_games(self, display=False):
@@ -226,6 +231,9 @@ class Runner:
             'agent_performance': self.performance,
             'data': {
                 'train_episode_rewards': self.train_episode_rewards,
+                'train_epsilons': self.train_epsilons
+            },
+            'data_test': {
                 'test_episode_rewards': self.test_episode_rewards,
             },
             'agent_history': self.agent.history
