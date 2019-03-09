@@ -50,3 +50,11 @@ class BaseAgent(ABC):
         :return:
         """
         pass
+
+    @property
+    def status(self):
+        """
+        Status of the agent
+        :return:
+        """
+        pass

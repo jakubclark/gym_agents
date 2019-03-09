@@ -218,14 +218,17 @@ class Runner:
                 'save_freq': self.save_freq,
                 'update_freq': self.update_freq,
                 'state_size': self.state_size,
-                'train_episode_rewards': self.train_episode_rewards,
-                'test_episode_rewards': self.test_episode_rewards,
                 'saved_mean': self.saved_mean,
                 'saved_means': self.saved_means,
                 'saved_model': self.model_file_path
             },
             'agent_config': self.agent.status,
-            'agent_performance': self.performance
+            'agent_performance': self.performance,
+            'data': {
+                'train_episode_rewards': self.train_episode_rewards,
+                'test_episode_rewards': self.test_episode_rewards,
+            },
+            'agent_history': self.agent.history
         }
 
     @property
@@ -233,8 +236,8 @@ class Runner:
         return{
             'train_average': np.mean(self.train_episode_rewards),
             'test_average': np.mean(self.test_episode_rewards),
-            'training_games_played': len(self.train_episode_rewards),
-            'test_games_played': len(self.test_episode_rewards)
+            'training_games_played': len(self.train_episode_rewards) - 1,
+            'test_games_played': len(self.test_episode_rewards) - 1
         }
 
     def save_config(self):

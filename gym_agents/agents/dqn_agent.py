@@ -29,6 +29,7 @@ class DQNAgent(BaseAgent):
         self.target_model = self._build_model()
         self.update_target_model()
 
+        self.episode_histories = []
         self.histories = []
 
     def _build_model(self):
@@ -84,6 +85,18 @@ class DQNAgent(BaseAgent):
             'epsilon_decay': self.epsilon_decay,
             'learning_rate': self.learning_rate,
         }
+
+    @property
+    def history(self) -> dict:
+        res: dict = {}
+
+        for k in self.histories[0].history.keys():
+            res[k] = []
+
+        for i, hist in enumerate(self.histories):
+            for k, v in hist.history.items():
+                res[k] += v
+        return res
 
     def save(self, name):
         log.info(f'Saving dqn model to {name}')
