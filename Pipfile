@@ -13,6 +13,9 @@ gym = {extras = ["atari"],version = "==0.11.0"}
 tensorflow = "==1.12.0"
 click = "==6.7"
 keras = "==2.2.4"
+jupyter = "*"
+matplotlib = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.6"

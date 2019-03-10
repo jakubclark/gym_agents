@@ -21,7 +21,7 @@ class DQNAgent(BaseAgent):
         self.gamma = kwargs.pop('gamma', 0.95)
         self.epsilon = kwargs.pop('epsilon', 1.)
         self.epsilon_min = kwargs.pop('epsilon_min', 0.01)
-        self.epsilon_decay = kwargs.pop('epsilon_decay', 0.99)
+        self.epsilon_decay = kwargs.pop('epsilon_decay', 0.999)
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)
         self.batch_size = kwargs.pop('batch_size', 32)
 
@@ -29,7 +29,7 @@ class DQNAgent(BaseAgent):
         self.target_model = self._build_model()
         self.update_target_model()
 
-        self.episode_histories = []
+        self.epsilons = []
         self.histories = []
 
     def _build_model(self):
@@ -107,4 +107,4 @@ class DQNAgent(BaseAgent):
             self.replay()
 
     def episode_done(self, episode_num):
-        self.target_model.set_weights(self.model.get_weights())
+        self.update_target_model()

@@ -234,7 +234,7 @@ class Runner:
                 'train_epsilons': self.train_epsilons
             },
             'data_test': {
-                'test_episode_rewards': self.test_episode_rewards,
+                'test_episode_rewards': self.test_episode_rewards
             },
             'agent_history': self.agent.history
         }
