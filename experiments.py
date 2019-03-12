@@ -1,26 +1,42 @@
+from multiprocessing import Process
+
+from click import echo
+
 from gym_agents.runner import Runner
 
-epsilon_decay = 'epsilon_decay'
+iv = 'epsilon_decay'
 agent = 'DQNAgent'
 env = 'CustomMountainCar-v0'
 
 agent_configs = [
-    {epsilon_decay: 0.99},
-    {epsilon_decay: 0.999},
-    {epsilon_decay: 0.9999}
+    {iv: 0.99},
+    {iv: 0.999},
+    {iv: 0.9999}
 ]
 
 
-def main():
+def target(i, config):
+    json_filename = f'{env}-{agent}-{iv}-{i}.json'
+    model_filename = f'models/{env}-{agent}-{iv}-{i}.model'
 
-    for i, config in enumerate(agent_configs):
-        filename = f'{agent}-{env}-{i}'
-        runner = Runner(None, 'DQNAgent', 'CustomMountainCar-v0',
-                        100000, 50, 4, 4, 4, config)
-        runner.play_testing_games()
-        runner.play_training_games()
-        runner.save_config(filename=filename)
+    runner = Runner(model_filename, 'DQNAgent', 'CustomMountainCar-v0',
+                    100000, 50, 4, 4, 4, config)
+    runner.play_training_games()
+    runner.play_testing_games()
+    runner.save_config(filename=json_filename)
+
+    echo(f'Finished running process for config: {config}')
 
 
 if __name__ == '__main__':
-    main()
+    processes = []
+
+    echo('Staring the experiments. WARNING: Standard Output will be all over the place')
+
+    for i, config in enumerate(agent_configs):
+        echo(f'Creating process for config: {config}')
+        p = Process(target=target, args=(i, config,))
+        processes.append(p)
+        p.start()
+    for p in processes:
+        p.join()

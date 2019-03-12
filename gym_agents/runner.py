@@ -34,7 +34,7 @@ def main(ctx, display, model_path, agent_id, environment_id, num_steps,
         return
 
     runner = Runner(model_path, agent_id, environment_id, num_steps,
-                    train_starts, save_freq, update_freq, train_freq)
+                    train_starts, save_freq, update_freq, train_freq, {})
 
     if play:
         runner.play_testing_games(display=display)
@@ -59,28 +59,10 @@ def list_environments():
     click.echo(envids)
 
 
-def play_game(env, agent):
-    state_size = flatten_shape(env.observation_space)
-    episode_reward = 0
-    state, reward, done = env.reset(), 0, False
-    state = np.reshape(state, [1, state_size])
-    while True:
-        action = agent.act_model(state, reward, done)
-        state, reward, done, _ = env.step(action)
-        state = np.reshape(state, [1, state_size])
-        episode_reward += reward
-        env.render()
-        if done:
-            click.echo(f'Episode reward: {episode_reward}')
-            episode_reward = 0
-            state = env.reset()
-            state = np.reshape(state, [1, state_size])
-
-
 class Runner:
 
     def __init__(self, load_model_path, agent_id, environment_id, num_steps,
-                 train_starts, save_freq, update_freq, train_freq):
+                 train_starts, save_freq, update_freq, train_freq, config):
         self.load_model_path = load_model_path
         self.agent_id = agent_id
         self.environment_id = environment_id
@@ -92,20 +74,24 @@ class Runner:
 
         self.env = create_env(self.environment_id)
         self.agent = agents[self.agent_id](self.env.action_space,
-                                           self.env.observation_space)
+                                           self.env.observation_space,
+                                           **config)
 
         self.state_size = flatten_shape(self.env.observation_space)
 
         self.train_episode_rewards = [0.0]
         self.test_episode_rewards = [0.0]
+
         self.train_epsilons = []
+
+        self.train_episode_steps = [0]
+        self.test_episode_steps = [0]
 
         self.saved_mean = -500
         self.saved_means = []
-        self.model_file_path = f'models/{self.environment_id}-{self.agent_id}.model'
+        self.model_file_path = load_model_path or f'models/{self.environment_id}-{self.agent_id}.model'
 
-        if load_model_path:
-            self.agent.load(load_model_path)
+        click.echo(self.model_file_path)
 
     def play_training_games(self):
         for epi in range(self.train_starts):
@@ -127,7 +113,9 @@ class Runner:
         state = np.reshape(state, [1, self.state_size])
         reward = 0
         done = False
+
         for step in bar:
+            self.train_episode_steps[-1] += 1
 
             # Action part
             action = self.agent.act(state, reward, done)
@@ -177,6 +165,7 @@ class Runner:
                 state = np.reshape(state, [1, self.state_size])
                 self.train_episode_rewards.append(0.0)
                 self.train_epsilons.append(self.agent.epsilon)
+                self.train_episode_steps.append(0)
                 continue
 
     def play_testing_games(self, display=False):
@@ -192,6 +181,7 @@ class Runner:
                 state = np.reshape(state, [1, self.state_size])
 
                 self.test_episode_rewards[-1] += reward
+                self.test_episode_steps[-1] += 1
                 if display:
                     self.env.render()
 
@@ -202,6 +192,7 @@ class Runner:
             log.info(s)
 
             self.test_episode_rewards.append(0.0)
+            self.test_episode_steps.append(0)
 
             state, reward, done = self.reset_env()
 
@@ -227,14 +218,19 @@ class Runner:
                 'saved_means': self.saved_means,
                 'saved_model': self.model_file_path
             },
-            'agent_config': self.agent.status,
+            'agent_config': {
+                'initial': self.agent.initial_config,
+                'final': self.agent.status
+            },
             'agent_performance': self.performance,
             'data': {
-                'train_episode_rewards': self.train_episode_rewards,
-                'train_epsilons': self.train_epsilons
+                'train_episode_rewards': self.train_episode_rewards[:-1],
+                'train_episode_epsilons': self.train_epsilons[:-1],
+                'train_episode_steps': self.train_episode_steps[:-1]
             },
             'data_test': {
-                'test_episode_rewards': self.test_episode_rewards
+                'test_episode_rewards': self.test_episode_rewards[:-1],
+                'test_episode_steps': self.test_episode_steps[:-1]
             },
             'agent_history': self.agent.history
         }
@@ -248,6 +244,7 @@ class Runner:
             'test_games_played': len(self.test_episode_rewards) - 1
         }
 
-    def save_config(self):
-        with open(f'{self.environment_id}-{self.agent_id}-config_performance.json', 'w') as fh:
+    def save_config(self, filename=None):
+        filename = filename or f'{self.environment_id}-{self.agent_id}-config_performance.json'
+        with open(filename, 'w') as fh:
             json.dump(self.config, fh, indent=2)
