@@ -20,7 +20,7 @@ def target(i, config):
     model_filename = f'models/{env}-{agent}-{iv}-{i}.model'
 
     runner = Runner(model_filename, 'DQNAgent', 'CustomMountainCar-v0',
-                    100000, 50, 4, 4, 4, config)
+                    100000, 50, 10, 4, 4, config)
     runner.play_training_games()
     runner.play_testing_games()
     runner.save_config(filename=json_filename)
