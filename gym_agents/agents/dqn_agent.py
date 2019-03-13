@@ -7,7 +7,7 @@ from keras import Sequential
 from keras.layers.core import Dense
 from keras.optimizers import Adam
 
-from ..util import flatten_shape
+from .. import flatten_shape
 from .base_agent import BaseAgent
 
 log = getLogger(__name__)
