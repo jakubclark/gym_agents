@@ -27,10 +27,10 @@ def make_plot(x, y=None, xlabel=None, ylabel=None, title=None):
     plt.show()
 
 
-def generate_policy_report(env_id, model_file_path):
+def generate_policy_report(agent_id, env_id, model_file_path):
     click.echo('Policy the agent uses when playing:')
     env = create_env(env_id)
-    agent = create_agent(env.action_space, env.observation_space)
+    agent = create_agent(agent_id, env.action_space, env.observation_space)
     agent.load(model_file_path)
 
     X = np.random.uniform(-1.2, 0.6, 10000)
@@ -68,10 +68,10 @@ def generate_policy_report(env_id, model_file_path):
     plt.show()
 
 
-def generate_game_report(env_id, model_filepath):
+def generate_game_report(agent_id, env_id, model_filepath):
     click.echo('Report for a single game, using the trained agent:')
     env = create_env(env_id)
-    agent = create_agent(env.action_space, env.observation_space)
+    agent = create_agent(agent_id, env.action_space, env.observation_space)
     agent.load(model_filepath)
 
     positions, velocities, actions = [], [], []
@@ -125,9 +125,9 @@ def generate_report(agent_id, env_id, iv, iteration):
     click.echo(f'Report for the Independent Variable:{iv}')
 
     click.echo('Initial agent config:')
-    click.echoer.pclick.echo(initial_agent_config)
+    printer.pprint(initial_agent_config)
     click.echo('Final agent config:')
-    click.echoer.pclick.echo(final_agent_config)
+    printer.pprint(final_agent_config)
 
     click.echo('Train Episode Plots:')
 
@@ -166,8 +166,8 @@ def generate_report(agent_id, env_id, iv, iteration):
         y.append(mean[f'{save_freq}_episode_mean'])
     make_plot(x, y, 'Episode Number', f'Last {save_freq} Episode Mean')
 
-    generate_game_report(env_id, model_filename)
-    generate_policy_report(env_id, model_filename)
+    generate_game_report(agent_id, env_id, model_filename)
+    generate_policy_report(agent_id, env_id, model_filename)
 
     agent_performance = data['agent_performance']
 
