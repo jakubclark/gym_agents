@@ -7,24 +7,32 @@ from .runner import Runner
 agent = 'DQNAgent'
 env = 'CustomMountainCar-v0'
 
+ed = 'epsilon_decay'
+nl = 'num_layers'
+lr = 'learning_rate'
+
+default_epsilon_decay = 0.99
+default_num_layers = 1
+default_learning_rate = 1e-3
+
 iv_configs = {
-    'learning_rate': [
-        {'learning_rate': 1e-2},
-        {'learning_rate': 1e-4},
-        {'learning_rate': 1e-5}
+    lr: [
+        {lr: 1e-2, ed: default_epsilon_decay, nl: default_num_layers},
+        {lr: 1e-4, ed: default_epsilon_decay, nl: default_num_layers},
+        {lr: 1e-5, ed: default_epsilon_decay, nl: default_num_layers}
     ],
-    'epsilon_decay': [
-        {'epsilon_decay': 0.9},
-        {'epsilon_decay': 0.999},
-        {'epsilon_decay': 0.9999}
+    ed: [
+        {ed: 0.9, lr: default_learning_rate, nl: default_num_layers},
+        {ed: 0.999, lr: default_learning_rate, nl: default_num_layers},
+        {ed: 0.9999, lr: default_learning_rate, nl: default_num_layers}
     ],
-    'num_layers': [
-        {'num_layers': 0},
-        {'num_layers': 2},
-        {'num_layers': 3},
+    nl: [
+        {nl: 0, ed: default_epsilon_decay, lr: default_learning_rate},
+        {nl: 2, ed: default_epsilon_decay, lr: default_learning_rate},
+        {nl: 3, ed: default_epsilon_decay, lr: default_learning_rate}
     ],
     'controlled': [
-        {'epsilon_decay': 0.99, 'num_layers': 1, 'learning_rate': 1e-3}
+        {ed: default_epsilon_decay, lr: default_learning_rate, nl: default_num_layers}
     ]
 }
 
