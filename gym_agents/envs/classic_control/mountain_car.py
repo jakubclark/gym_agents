@@ -12,7 +12,7 @@ class MountainCarEnv(GymMountainCarEnv):
             action), "%r (%s) invalid" % (action, type(action))
 
         position, velocity = self.state
-        velocity += (action-1)*0.001 + cos(3*position)*(-0.0025)
+        velocity += (action - 1) * 0.001 + cos(3 * position) * (-0.0025)
         velocity = np.clip(velocity, -self.max_speed, self.max_speed)
         position += velocity
         position = np.clip(position, self.min_position, self.max_position)

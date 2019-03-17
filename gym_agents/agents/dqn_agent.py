@@ -7,7 +7,7 @@ from keras import Sequential
 from keras.layers.core import Dense
 from keras.optimizers import Adam
 
-from ..util import flatten_shape
+from .. import flatten_shape
 from .base_agent import BaseAgent
 
 log = getLogger(__name__)
@@ -24,6 +24,7 @@ class DQNAgent(BaseAgent):
         self.epsilon_decay = kwargs.pop('epsilon_decay', 0.999)
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)
         self.batch_size = kwargs.pop('batch_size', 32)
+        self.num_layers = kwargs.pop('num_layers', 1)
 
         self.model = model or self._build_model()
         self.target_model = self._build_model()
@@ -31,11 +32,13 @@ class DQNAgent(BaseAgent):
 
         self.epsilons = []
         self.histories = []
+        self.initial_config = self.status
 
     def _build_model(self):
         model = Sequential()
         model.add(Dense(24, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(24, activation='relu'))
+        (model.add(Dense(24, activation='relu'))
+         for _ in range(self.num_layers))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=Adam(lr=self.learning_rate))
@@ -84,6 +87,7 @@ class DQNAgent(BaseAgent):
             'epsilon_min': self.epsilon_min,
             'epsilon_decay': self.epsilon_decay,
             'learning_rate': self.learning_rate,
+            'num_layers': self.num_layers
         }
 
     @property
