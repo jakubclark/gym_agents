@@ -3,6 +3,7 @@ from multiprocessing import Process
 import click
 
 from .runner import Runner
+from .constants import EXPERIMENT_RESULTS_PATH, MODELS_PATH
 
 agent = 'DQNAgent'
 env = 'CustomMountainCar-v0'
@@ -39,8 +40,8 @@ iv_configs = {
 
 def run_experiments():
     def target(i_, iv_, config_):
-        json_filename = f'{env}-{agent}-{iv_}-{i_}.json'
-        model_filename = f'models/{env}-{agent}-{iv_}-{i_}.model'
+        json_filename = f'{EXPERIMENT_RESULTS_PATH}/{env}-{agent}-{iv_}-{i_}.json'
+        model_filename = f'{MODELS_PATH}/{env}-{agent}-{iv_}-{i_}.model'
 
         runner = Runner(model_filename, 'DQNAgent', 'CustomMountainCar-v0',
                         100000, 50, 10, 4, 4, config_)

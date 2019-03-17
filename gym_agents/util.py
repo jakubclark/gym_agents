@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 
 from .agents import create_agent
 from .envs import create_env
+from .constants import EXPERIMENT_RESULTS_PATH, MODELS_PATH, POLICY_PLOTS_PATH
 
 printer = PrettyPrinter(indent=2)
 
@@ -27,8 +28,11 @@ def make_plot(x, y=None, xlabel=None, ylabel=None, title=None):
     plt.show()
 
 
-def generate_policy_report(agent_id, env_id, model_file_path):
+def generate_policy_report(agent_id, env_id, model_file_path, iv, iteration):
     click.echo('Policy the agent uses when playing:')
+
+    policy_fig_name = f'{POLICY_PLOTS_PATH}/{env_id}-{agent_id}-{iv}-{iteration}.png'
+
     env = create_env(env_id)
     agent = create_agent(agent_id, env.action_space, env.observation_space)
     agent.load(model_file_path)
@@ -43,7 +47,6 @@ def generate_policy_report(agent_id, env_id, model_file_path):
         Z.append(action)
     Z = pd.Series(Z)
     colors_ = {0: 'blue', 1: 'lime', 2: 'red'}
-    colors = Z.apply(lambda x: colors_[x])
     labels = ['Left', 'Right', 'Nothing']
 
     fig = plt.figure(3, figsize=[7, 7])
@@ -54,16 +57,17 @@ def generate_policy_report(agent_id, env_id, model_file_path):
     ax.set_ylabel('Velocity')
     ax.set_title('Policy')
     recs = []
+
     for i in range(0, 3):
         recs.append(
             mpatches.Rectangle(
                 (0, 0),
                 1, 1,
-                fc=sorted(colors.unique())[i]
+                fc=colors_[i]
             )
         )
     plt.legend(recs, labels, loc=4, ncol=3)
-    fig.savefig(f'{model_file_path}-policy.png')
+    fig.savefig(policy_fig_name)
     plt.axvline(0.5)
     plt.show()
 
@@ -109,8 +113,8 @@ def generate_game_report(agent_id, env_id, model_filepath):
 
 def generate_report(agent_id, env_id, iv, iteration):
 
-    json_filename = f'{env_id}-{agent_id}-{iv}-{iteration}.json'
-    model_filename = f'models/{env_id}-{agent_id}-{iv}-{iteration}.model'
+    json_filename = f'{EXPERIMENT_RESULTS_PATH}/{env_id}-{agent_id}-{iv}-{iteration}.json'
+    model_filename = f'{MODELS_PATH}/{env_id}-{agent_id}-{iv}-{iteration}.model'
 
     try:
         with open(json_filename) as fh:
@@ -167,7 +171,7 @@ def generate_report(agent_id, env_id, iv, iteration):
     make_plot(x, y, 'Episode Number', f'Last {save_freq} Episode Mean')
 
     generate_game_report(agent_id, env_id, model_filename)
-    generate_policy_report(agent_id, env_id, model_filename)
+    generate_policy_report(agent_id, env_id, model_filename, iv, iteration)
 
     agent_performance = data['agent_performance']
 
