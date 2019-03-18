@@ -145,7 +145,8 @@ class Runner:
 
             epi = len(self.test_episode_rewards)
             score = self.test_episode_rewards[-1]
-            s = f'Test Episode: {epi}/100, Score: {score}'
+            steps = self.test_episode_steps[-1]
+            s = f'Test Episode: {epi}/100, Score: {score}, Steps: {steps}'
             click.echo(s)
             log.info(s)
 
