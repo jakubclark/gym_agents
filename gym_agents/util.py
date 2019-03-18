@@ -8,8 +8,8 @@ from matplotlib import patches as mpatches
 from matplotlib import pyplot as plt
 
 from .agents import create_agent
-from .envs import create_env
 from .constants import EXPERIMENT_RESULTS_PATH, MODELS_PATH, POLICY_PLOTS_PATH
+from .envs import create_env
 
 printer = PrettyPrinter(indent=2)
 

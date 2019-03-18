@@ -2,8 +2,8 @@ from multiprocessing import Process
 
 import click
 
-from .runner import Runner
 from .constants import EXPERIMENT_RESULTS_PATH, MODELS_PATH
+from .runner import Runner
 
 agent = 'DQNAgent'
 env = 'CustomMountainCar-v0'

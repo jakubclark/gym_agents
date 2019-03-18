@@ -123,6 +123,3 @@ dmypy.json
 
 .vscode/
 
-
-models/
-experiment_results
