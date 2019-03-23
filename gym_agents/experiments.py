@@ -19,21 +19,21 @@ default_learning_rate = 1e-3
 iv_configs = {
     lr: [
         {lr: 1e-2, ed: default_epsilon_decay, nl: default_num_layers},
+        {lr: 1e-3, ed: default_epsilon_decay, nl: default_num_layers},
         {lr: 1e-4, ed: default_epsilon_decay, nl: default_num_layers},
         {lr: 1e-5, ed: default_epsilon_decay, nl: default_num_layers}
     ],
     ed: [
         {ed: 0.9, lr: default_learning_rate, nl: default_num_layers},
+        {ed: 0.99, lr: default_learning_rate, nl: default_num_layers},
         {ed: 0.999, lr: default_learning_rate, nl: default_num_layers},
         {ed: 0.9999, lr: default_learning_rate, nl: default_num_layers}
     ],
     nl: [
         {nl: 0, ed: default_epsilon_decay, lr: default_learning_rate},
+        {nl: 1, ed: default_epsilon_decay, lr: default_learning_rate},
         {nl: 2, ed: default_epsilon_decay, lr: default_learning_rate},
         {nl: 3, ed: default_epsilon_decay, lr: default_learning_rate}
-    ],
-    'controlled': [
-        {ed: default_epsilon_decay, lr: default_learning_rate, nl: default_num_layers}
     ]
 }
 
