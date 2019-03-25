@@ -53,7 +53,7 @@ def run_experiments(configs: dict = None):
     click.echo(
         'Staring the experiments. WARNING: Standard Output will be all over the place')
 
-    for iv, configs in iv_configs.items():
+    for iv, configs in configs.items():
         for i, config in enumerate(configs):
             click.echo(f'Creating process. IV: {iv}, Config: {config}')
             p = Process(target=target, args=(i, iv, config,))
