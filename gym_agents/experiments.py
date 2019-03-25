@@ -19,26 +19,23 @@ default_learning_rate = 1e-3
 iv_configs = {
     lr: [
         {lr: 1e-2, ed: default_epsilon_decay, nl: default_num_layers},
-        {lr: 1e-4, ed: default_epsilon_decay, nl: default_num_layers},
-        {lr: 1e-5, ed: default_epsilon_decay, nl: default_num_layers}
+        {lr: 1e-3, ed: default_epsilon_decay, nl: default_num_layers},
+        {lr: 1e-4, ed: default_epsilon_decay, nl: default_num_layers}
     ],
     ed: [
         {ed: 0.9, lr: default_learning_rate, nl: default_num_layers},
-        {ed: 0.999, lr: default_learning_rate, nl: default_num_layers},
-        {ed: 0.9999, lr: default_learning_rate, nl: default_num_layers}
+        {ed: 0.99, lr: default_learning_rate, nl: default_num_layers},
+        {ed: 0.999, lr: default_learning_rate, nl: default_num_layers}
     ],
     nl: [
         {nl: 0, ed: default_epsilon_decay, lr: default_learning_rate},
-        {nl: 2, ed: default_epsilon_decay, lr: default_learning_rate},
-        {nl: 3, ed: default_epsilon_decay, lr: default_learning_rate}
-    ],
-    'controlled': [
-        {ed: default_epsilon_decay, lr: default_learning_rate, nl: default_num_layers}
+        {nl: 1, ed: default_epsilon_decay, lr: default_learning_rate},
+        {nl: 2, ed: default_epsilon_decay, lr: default_learning_rate}
     ]
 }
 
 
-def run_experiments():
+def run_experiments(configs: dict = None):
     def target(i_, iv_, config_):
         json_filename = f'{EXPERIMENT_RESULTS_PATH}/{env}-{agent}-{iv_}-{i_}.json'
         model_filename = f'{MODELS_PATH}/{env}-{agent}-{iv_}-{i_}.model'
@@ -51,11 +48,12 @@ def run_experiments():
 
         click.echo(f'Finished running process for config: {config}')
 
+    configs = configs or iv_configs
     processes = []
     click.echo(
         'Staring the experiments. WARNING: Standard Output will be all over the place')
 
-    for iv, configs in iv_configs.items():
+    for iv, configs in configs.items():
         for i, config in enumerate(configs):
             click.echo(f'Creating process. IV: {iv}, Config: {config}')
             p = Process(target=target, args=(i, iv, config,))
